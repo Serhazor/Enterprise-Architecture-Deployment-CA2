@@ -2,8 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables
 
-
-// MongoDB connection
+// MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -14,17 +13,17 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Create Express App
 const app = express();
 
-// Essential Middleware 
+// Essential Middleware
 app.use(express.json()); // Parses incoming JSON request bodies
 
 // Import Routes
 const recipesRouter = require('./routes/recipes');
 
 // Mount Routes
-app.use('/recipes', recipesRouter); 
+app.use('/recipes', recipesRouter);
 
 // Start the Server
-const port = process.env.PORT || 8080; 
+const port = process.env.PORT || 8080; // Use environment variable for port
 app.listen(port, () => {
     console.log(`Recipe Service listening on port ${port}`);
 });
