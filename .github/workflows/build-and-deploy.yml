@@ -14,7 +14,7 @@ jobs:
 
       - name: Build and tag Docker image
         run: |
-          docker build -t gcr.io/tu-dublin-ca/recipe-service:latest .
+          docker build -t gcr.io/tu-dublin-ca/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
           docker tag gcr.io/tu-dublin-ca/recipe-service:latest gcr.io/tu-dublin-ca/recipe-service:${{ github.sha }}
 
       - name: Set up Google Cloud SDK
