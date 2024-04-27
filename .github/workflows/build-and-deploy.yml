@@ -14,14 +14,13 @@ jobs:
 
       - name: Build and tag Docker image
         run: |
-          docker build -t gcr.io/tu-dublin-ca/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
-          docker tag gcr.io/tu-dublin-ca/recipe-service:latest gcr.io/tu-dublin-ca/recipe-service:${{ github.sha }}
+          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
+          docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.tu_dublin_ca }}
-          version: 'latest'
 
       - name: Authenticate GCloud Service Account
         uses: google-github-actions/auth@v0.7.1
@@ -29,9 +28,9 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Configure Docker for GCR
-        run: gcloud auth configure-docker europe-west4 --quiet
+        run: gcloud auth configure-docker --quiet
 
-      - name: Push image to GCR
+      - name: Push image to GAR
         run: |
-          docker push gcr.io/tu-dublin-ca/recipe-service:latest
-          docker push gcr.io/tu-dublin-ca/recipe-service:${{ github.sha }}
+          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest
+          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
