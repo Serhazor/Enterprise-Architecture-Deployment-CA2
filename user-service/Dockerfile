@@ -11,11 +11,7 @@ WORKDIR /app
 COPY --from=build-stage /app/node_modules /app/node_modules
 COPY . . 
 EXPOSE 8081
-CMD ["node", "index.js"] 
 
-
-# Working Directory
-WORKDIR /app
 
 # Copy Dependency Files
 COPY package*.json ./
