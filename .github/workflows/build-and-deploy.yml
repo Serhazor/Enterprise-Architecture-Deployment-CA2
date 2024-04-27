@@ -36,10 +36,10 @@ jobs:
               echo "GCP_SA_KEY is set."
             fi
         
-
       - name: Configure Docker for GCR
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | docker login -u _json_key --password-stdin https://us-docker.pkg.dev
+          echo "${{ secrets.GCP_SA_KEY }}" | docker login -u _json_key --password-stdin https://us-docker.pkg.dev || (echo "Docker login failed" && exit 1)
+          
           
 
       - name: Push image to GAR
