@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Latest stable version for Node.js 20 support
+        uses: actions/checkout@v3  # This action is generally kept up-to-date
 
       - name: Build and tag Docker image
         run: |
@@ -18,12 +18,12 @@ jobs:
           docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
 
       - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.0  # Use a specific version instead of 'latest'
+        uses: google-github-actions/setup-gcloud@v0.8.0  # Check for the latest version supporting Node.js 20
         with:
           project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
 
       - name: Authenticate GCloud Service Account
-        uses: google-github-actions/auth@v0.4.0  # Ensure you use a specific version
+        uses: google-github-actions/auth@v0.8.0  # Ensure this version is up-to-date and compatible
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
