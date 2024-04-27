@@ -20,19 +20,27 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.tu_dublin_ca }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+        
 
       - name: Authenticate GCloud Service Account
         uses: google-github-actions/auth@v0.7.1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Print GCP Credentials  # Debugging Step
-        run: echo ${{ secrets.GCP_SA_KEY }}
+      - name: Verify Credentials are Set
+        run: |
+            if [ -z "${{ secrets.GCP_SA_KEY }}" ]; then
+              echo "GCP_SA_KEY is not set."
+            else
+              echo "GCP_SA_KEY is set."
+            fi
+        
 
       - name: Configure Docker for GCR
         run: |
-          echo ${{ secrets.GCP_SA_KEY }} | docker login -u _json_key --password-stdin https://us-docker.pkg.dev
+          echo "${{ secrets.GCP_SA_KEY }}" | docker login -u _json_key --password-stdin https://us-docker.pkg.dev
+          
 
       - name: Push image to GAR
         run: |
