@@ -2,27 +2,32 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ] 
+    branches: [main]
 
 jobs:
   build-and-push-image:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3 
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Build and tag Docker image
-        run: docker build -t gcr.io/tu-dublin-ca/recipe-service:latest .  
+        run: |
+          docker build -t gcr.io/tu-dublin-ca/recipe-service:latest .
+          docker tag gcr.io/tu-dublin-ca/recipe-service:latest gcr.io/tu-dublin-ca/recipe-service:${{ github.sha }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.tu-dublin-ca }} 
-          service_account_key: ${{ secrets.GCP_SA_KEY }}  
+          project_id: ${{ secrets.tu_dublin_ca }}  
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
       - name: Configure Docker for GCR
-        run: gcloud auth configure-docker europe-west4     
+        run: gcloud auth configure-docker europe-west4 --quiet
 
       - name: Push image to GCR
-        run: docker push gcr.io/tu-dublin-ca/recipe-service:latest 
+        run: |
+          docker push gcr.io/tu-dublin-ca/recipe-service:latest
+          docker push gcr.io/tu-dublin-ca/recipe-service:${{ github.sha }}
