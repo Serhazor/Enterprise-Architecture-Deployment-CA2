@@ -14,8 +14,9 @@ jobs:
 
       - name: Build and tag Docker images
         run: |
-          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile . 
+          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/ 
           docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1  # Use latest stable version
