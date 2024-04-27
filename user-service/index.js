@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config(); 
 
+mongoose.set('strictQuery', false); 
+
 // MongoDB Connection 
 mongoose.connect(process.env.MONGODB_URI, { 
     useNewUrlParser: true,
