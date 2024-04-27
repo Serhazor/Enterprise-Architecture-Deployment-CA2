@@ -19,14 +19,14 @@ jobs:
 
 
       - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1  # Use latest stable version
+        uses: google-github-actions/setup-gcloud@v1  
         with:
           project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }} 
           service_account_key: ${{ secrets.GCP_SA_KEY }}  
           export_default_credentials: true
 
       - name: Configure Docker for GCR
-        run: gcloud auth configure-docker us-docker.pkg.dev # More concise approach
+        run: gcloud auth configure-docker us-docker.pkg.dev 
 
       - name: Push images to Google Artifact Registry
         run: |
