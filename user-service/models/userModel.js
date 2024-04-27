@@ -14,21 +14,13 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    dietaryPreferences: {
-        type: [String],
-        default: []
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now 
-    } 
+    }
 });
 
-// Hash password before saving 
+// Hash password before saving (pre-save hook)
 userSchema.pre('save', async function(next) {
     try {
-        if (!this.isModified('password')) return next(); // Only hash if the password is new or modified
+        if (!this.isModified('password')) return next(); 
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(this.password, salt);

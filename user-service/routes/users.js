@@ -3,64 +3,48 @@ const router = express.Router();
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 
-// Create a User (Registration)
+// POST /users -  Register a New User
 router.post('/users', async (req, res) => {
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const newUser = new User({ ...req.body, password: hashedPassword });
+        const hashedPassword = await bcrypt.hash(req.body.password, 10); 
+
+        const newUser = new User({ 
+            ...req.body, 
+            password: hashedPassword 
+        });
+
         const savedUser = await newUser.save();
 
+        // Do NOT send the password back in the response! 
         res.status(201).json({
-            _id: savedUser._id, 
+            _id: savedUser._id,
             name: savedUser.name,
             email: savedUser.email
         });
     } catch (err) {
         if (err.name === 'ValidationError') {
             res.status(400).json({ error: err.message });
-        } else if (err.code === 11000) { 
-            res.status(400).json({ error: 'Email already exists' }); 
+        } else if (err.code === 11000) { // MongoDB duplicate key error
+            res.status(400).json({ error: 'Email already exists' });
         } else {
-            res.status(500).json({ error: 'Failed to create user' });
+            res.status(500).json({ error: 'Failed to register user' });
         }
     }
 });
 
-// User Login (Basic)
+// POST /users/login - Simplified Login (NOT production-ready)
 router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        if (!user) return res.status(400).json({ error: 'Invalid credentials' }); 
+        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
-        if (!isPasswordValid) return res.status(400).json({ error: 'Invalid credentials' }); 
+        const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+        if (!passwordMatch) return res.status(400).json({ error: 'Invalid credentials' }); 
 
+        // Successful login - In a real application, generate a JWT
         res.json({ message: 'Login successful' }); 
     } catch (err) {
         res.status(500).json({ error: 'Error logging in' }); 
-    }
-});
-
-// Get User Profile
-router.get('/users/:id', async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (!user) return res.status(404).json({ error: 'User not found' }); 
-
-        // Send back only necessary profile data
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            dietaryPreferences: user.dietaryPreferences,
-            profilePicture: user.profilePicture // If you have this field
-        });
-    } catch (err) {
-        if (err.name === 'CastError') { 
-            res.status(400).json({ error: 'Invalid user ID' }); 
-        } else {
-            res.status(500).json({ error: 'Error fetching user profile' });
-        }
     }
 });
 
