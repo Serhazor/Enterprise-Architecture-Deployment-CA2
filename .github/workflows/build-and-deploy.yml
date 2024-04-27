@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Check for any updated version compatible with Node.js 20
 
       - name: Build and tag Docker image
         run: |
@@ -18,11 +18,14 @@ jobs:
           docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
 
       - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@latest  # Ensure you use the latest version
         with:
           project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+
+      - name: Authenticate GCloud Service Account
+        uses: google-github-actions/auth@v0.7.1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Configure Docker for GCR
         run: |
