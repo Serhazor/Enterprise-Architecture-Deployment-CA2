@@ -1,0 +1,1 @@
+console.log("Hello! My recipe app is starting up."); 
