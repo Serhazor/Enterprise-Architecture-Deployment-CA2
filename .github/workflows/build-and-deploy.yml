@@ -1,4 +1,4 @@
-name: Diagnostic CI
+name: Simplified Diagnostic CI
 
 on:
   push:
@@ -13,17 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Print environment
-        run: env
-
-      - name: Docker Info
-        run: docker info
-
-      - name: Print gcloud version
-        run: gcloud version
-
-      - name: Check Bash Version
-        run: bash --version
-
-      - name: List all installed packages
-        run: dpkg --list
+      - name: Test Shell Command
+        run: |
+          echo "Testing environment..."
+          env
+          echo "Checking docker..."
+          docker info
+          echo "Checking gcloud..."
+          gcloud version
