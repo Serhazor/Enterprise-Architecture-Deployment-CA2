@@ -1,39 +1,35 @@
-name: CI/CD Pipeline
+  name: CI/CD Pipeline
+  on:
+    push:
+      branches:
+        - main
+  jobs:
+    build-and-push-image:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+        - name: Build and tag Docker images
+          run: >
+            docker build -t
+            us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f
+            recipe-service/Dockerfile recipe-service/ 
 
-on:
-  push:
-    branches: [main]
+            docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+        - name: Set up Google Cloud SDK
+          uses: google-github-actions/setup-gcloud@v1
+          with:
+            project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+            service_account_key: ${{ secrets.GCP_SA_KEY }}
+            export_default_credentials: true
+        - name: Print Secret Contents (for debugging only)
+          run: echo ${{ secrets.GCP_SA_KEY }}
+        - name: Configure Docker for GCR
+          run: gcloud auth configure-docker us-docker.pkg.dev --service-account=${{
+            secrets.GCP_SA_KEY }}
+        - name: Push images to Google Artifact Registry
+          run: >
+            docker push
+            us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest
 
-jobs:
-  build-and-push-image:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3 
-
-      - name: Build and tag Docker images
-        run: |
-          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/ 
-          docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
-
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1  
-        with:
-          project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }} 
-          service_account_key: ${{ secrets.GCP_SA_KEY }}  
-          export_default_credentials: true
-          
-      - name: Print Secret Contents (for debugging only)
-        run: echo ${{ secrets.GCP_SA_KEY }}
-        
-
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker us-docker.pkg.dev --service-account=${{ secrets.GCP_SA_KEY }}
-        
-
-      - name: Push images to Google Artifact Registry
-        run: |
-          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest
-          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+            docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
