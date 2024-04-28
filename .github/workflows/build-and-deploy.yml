@@ -1,4 +1,4 @@
-name: Simplified Diagnostic CI
+name: Incremental Diagnostic CI
 
 on:
   push:
@@ -6,14 +6,14 @@ on:
       - main
 
 jobs:
-  diagnostic-build:
+  build-and-push-image:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Test Shell Command
+      - name: Print environment and tools version
         run: |
           echo "Testing environment..."
           env
@@ -21,3 +21,14 @@ jobs:
           docker info
           echo "Checking gcloud..."
           gcloud version
+
+      - name: Build and tag Docker images
+        run: |
+          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
+          docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+
+      - name: Push images to Google Artifact Registry
+        run: |
+          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest
+          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+
