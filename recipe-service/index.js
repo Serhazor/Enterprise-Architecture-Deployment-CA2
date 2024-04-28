@@ -24,7 +24,7 @@ const recipesRouter = require('./routes/recipes');
 app.use('/recipes', recipesRouter);
 
 // Start the Server
-const port = process.env.PORT || 8080; // Use environment variable for port
+const port = process.env.PORT || 8080; 
 app.listen(port, () => {
     console.log(`Recipe Service listening on port ${port}`);
 });

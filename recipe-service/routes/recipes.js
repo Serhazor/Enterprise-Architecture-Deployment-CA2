@@ -10,6 +10,7 @@ router.use((req, res, next) => {
 
 // POST /recipes - Create a new Recipe
 router.post('/recipes', async (req, res) => {
+    console.log(req.method, req.url, req.headers, req.body);
     try {
         const newRecipe = new Recipe({ ...req.body, createdBy: req.user.id });
         const savedRecipe = await newRecipe.save();
@@ -24,12 +25,12 @@ router.post('/recipes', async (req, res) => {
 });
 
 // GET /recipes - Fetch all Recipes (Simplified)
-router.get('/recipes', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const recipes = await Recipe.find(); 
-        res.json(recipes);
+        const recipes = await Recipe.find(); // Fetch all recipes from the database
+        res.json(recipes); // Send the recipes as a JSON response
     } catch (err) {
-        res.status(500).json({ error: 'Error fetching recipes' }); 
+        res.status(500).json({ error: 'Error fetching recipes' });
     }
 });
 

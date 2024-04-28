@@ -5,32 +5,25 @@ const bcrypt = require('bcrypt');
 
 // POST /users -  Register a New User
 router.post('/users', async (req, res) => {
+    console.log("Route hit", req.body);
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10); 
-
+        // Remove password hashing for isolation test
         const newUser = new User({ 
-            ...req.body, 
-            password: hashedPassword 
+            ...req.body
         });
 
         const savedUser = await newUser.save();
-
-        // Do NOT send the password back in the response! 
         res.status(201).json({
             _id: savedUser._id,
             name: savedUser.name,
             email: savedUser.email
         });
     } catch (err) {
-        if (err.name === 'ValidationError') {
-            res.status(400).json({ error: err.message });
-        } else if (err.code === 11000) { // MongoDB duplicate key error
-            res.status(400).json({ error: 'Email already exists' });
-        } else {
-            res.status(500).json({ error: 'Failed to register user' });
-        }
+        console.log("Error in route:", err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 // POST /users/login - Simplified Login (NOT production-ready)
 router.post('/users/login', async (req, res) => {
