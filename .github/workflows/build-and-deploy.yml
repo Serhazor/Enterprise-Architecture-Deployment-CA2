@@ -13,6 +13,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Node.js dependencies for user-service
+        run: |
+          cd user-service
+          npm install
+
+      - name: Run tests in user-service
+        run: |
+          cd user-service
+          npm test
+
       - name: Build and tag Recipe Service Docker image
         run: |
           docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
