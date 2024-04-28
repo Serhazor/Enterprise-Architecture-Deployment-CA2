@@ -1,35 +1,37 @@
 # Base Image
-# Build Stage
 FROM node:16 AS build-stage
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
 
-# Runtime Stage
-FROM node:16-slim AS runtime-stage
+# Set Working Directory
 WORKDIR /app
-COPY --from=build-stage /app/node_modules /app/node_modules
-COPY . . 
-EXPOSE 8081
-
 
 # Copy Dependency Files
 COPY package*.json ./
 
 # Install Dependencies
-RUN npm install 
+RUN npm install
+
+# Build Stage Complete - node_modules are ready
+
+# Runtime Stage
+FROM node:16-slim AS runtime-stage
+
+# Set Working Directory
+WORKDIR /app
+
+# Copy node_modules from build-stage
+COPY --from=build-stage /app/node_modules /app/node_modules
 
 # Copy Application Code
-COPY . . 
+COPY . .
 
 # Expose the Port
-EXPOSE 8081  
+EXPOSE 8081
 
-# Install build tools, rebuild bcrypt, and remove build tools
+# Use apt to install dependencies required for bcrypt
 RUN apt-get update && \
-    apt-get install -y build-essential python2 g++ make && \
+    apt-get install -y build-essential python3 g++ make && \
     npm rebuild bcrypt --build-from-source && \
-    apt-get purge -y build-essential python2 g++ make && \
+    apt-get purge -y build-essential python3 g++ make && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
