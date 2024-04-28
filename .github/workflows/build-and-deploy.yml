@@ -21,14 +21,21 @@ jobs:
           docker info
           echo "Checking gcloud..."
           gcloud version
-
-      - name: Authenticate with Google Cloud
+          
+      - name: Check JSON Format
         run: |
           echo "${{ secrets.GCP_SA_KEY }}" > gcp-key.json
+          head -c 100 gcp-key.json
           gcloud auth activate-service-account --key-file=gcp-key.json
           gcloud auth configure-docker us-docker.pkg.dev --quiet
         
-        
+
+      - name: Authenticate with Google Cloud
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > gcp-key.json
+          gcloud auth activate-service-account --key-file=gcp-key.json
+          gcloud auth configure-docker us-docker.pkg.dev --quiet
+       
       - name: Test GCloud Authentication
         run: |
           gcloud auth list
