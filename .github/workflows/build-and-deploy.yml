@@ -13,19 +13,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: List files in the repository
-        run: ls -la
-
-      - name: Build and tag Docker images
+      - name: Build and tag Recipe Service Docker image
         run: |
           docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
           docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+
+      - name: Build and tag User Service Docker image
+        run: |
+          docker build -t us-docker.pkg.dev/tu-dublin-ca/user-service/user-service:latest -f user-service/Dockerfile user-service/
+          docker tag us-docker.pkg.dev/tu-dublin-ca/user-service/user-service:latest us-docker.pkg.dev/tu-dublin-ca/user-service/user-service:${{ github.sha }}
 
       - name: Login to Google Artifact Registry
         run: |
           echo '${{ secrets.GCP_SA_KEY }}' | docker login -u _json_key --password-stdin https://us-docker.pkg.dev
 
-      - name: Push images to Google Artifact Registry
+      - name: Push Recipe Service images to Google Artifact Registry
         run: |
           docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest
           docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+
+      - name: Push User Service images to Google Artifact Registry
+        run: |
+          docker push us-docker.pkg.dev/tu-dublin-ca/user-service/user-service:latest
+          docker push us-docker.pkg.dev/tu-dublin-ca/user-service/user-service:${{ github.sha }}
