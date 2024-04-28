@@ -16,9 +16,9 @@ jobs:
       - name: List files in the repository
         run: ls -la
 
-      - name: Build and tag Docker image
+      - name: Build and tag Docker images
         run: |
-          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f Dockerfile .
+          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
           docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
 
       - name: Login to Google Artifact Registry
