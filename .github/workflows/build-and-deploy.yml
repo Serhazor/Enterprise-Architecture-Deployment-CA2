@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Diagnostic CI
 
 on:
   push:
@@ -6,36 +6,24 @@ on:
       - main
 
 jobs:
-  build-and-push-image:
+  diagnostic-build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build and tag Docker images
-        run: |
-          docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
-          docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
-        shell: bash
+      - name: Print environment
+        run: env
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+      - name: Docker Info
+        run: docker info
 
-      - name: Print Secret Contents (for debugging only)
-        run: echo ${{ secrets.GCP_SA_KEY }}
-        shell: bash
+      - name: Print gcloud version
+        run: gcloud version
 
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker us-docker.pkg.dev --quiet --service-account=${{ secrets.GCP_SA_KEY }}
-        shell: bash
+      - name: Check Bash Version
+        run: bash --version
 
-      - name: Push images to Google Artifact Registry
-        run: |
-          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest
-          docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
-        shell: bash
+      - name: List all installed packages
+        run: dpkg --list
