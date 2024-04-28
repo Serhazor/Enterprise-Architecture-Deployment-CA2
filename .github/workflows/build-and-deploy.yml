@@ -1,11 +1,14 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -14,6 +17,7 @@ jobs:
         run: |
           docker build -t us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest -f recipe-service/Dockerfile recipe-service/
           docker tag us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+        shell: bash
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -24,11 +28,14 @@ jobs:
 
       - name: Print Secret Contents (for debugging only)
         run: echo ${{ secrets.GCP_SA_KEY }}
+        shell: bash
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker us-docker.pkg.dev --quiet --service-account=${{ secrets.GCP_SA_KEY }}
+        shell: bash
 
       - name: Push images to Google Artifact Registry
         run: |
           docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:latest
           docker push us-docker.pkg.dev/tu-dublin-ca/recipe-service/recipe-service:${{ github.sha }}
+        shell: bash
